@@ -35,18 +35,12 @@ const CartProvider: React.FC = ({ children }) => {
     //  await AsyncStorage.removeItem('@GoMarketplace:products');
       try {
         const storedData = await AsyncStorage.getItem('@GoMarketplace:products');
-
           // We have data!!
-
           storedData !== null ? setProducts([...JSON.parse(storedData)]) : null;
-
-          console.log(`storage inicial: \n ${JSON.stringify(products)}`);
-
 
       } catch (error) {
         // Error retrieving data
         console.log(error);
-
       }
     }
 
@@ -60,84 +54,57 @@ const CartProvider: React.FC = ({ children }) => {
 
       product.quantity=1;
       setProducts([...products, product]);
-      try {
+
           await AsyncStorage.setItem(
           '@GoMarketplace:products',
           JSON.stringify(products)
         );
 
-      } catch (error) {
-        // Error saving data
-        console.log(error);
+    } else {
 
-      }
-
-
-
-  } else {
     increment(product.id);
-  }
 
-  }, [products, setProducts]);
+    }
+
+  }, [products]);
 
   const increment = useCallback(async id => {
     // TODO INCREMENTS A PRODUCT QUANTITY IN THE CART
 
-   const product = products.filter(product => product.id === id)[0];
-   const updatedProducts = products;
-   const elementIndex =  updatedProducts.indexOf(product)
-   let {quantity} = product;
+    const updatedProducts = products.map(p =>
+      p.id === id ? { ...p, quantity: p.quantity + 1 } : p,
+    );
+    setProducts(updatedProducts);
 
-   quantity += 1;
-   updatedProducts[elementIndex] = {...updatedProducts[elementIndex], quantity}
-
-   setProducts(updatedProducts);
-
-
-   try {
     await AsyncStorage.setItem(
     '@GoMarketplace:products',
     JSON.stringify(products)
-  );
+    );
 
-} catch (error) {
-  // Error saving data
-  console.log(error);
+    console.log(products);
 
-}
-  }, [products, setProducts]);
+  }, [products]);
+
+
 
   const decrement = useCallback(async id => {
     // TODO DECREMENTS A PRODUCT QUANTITY IN THE CART
-    const product = products.filter(product => product.id === id)[0];
 
-    const updatedProducts = products;
-    const elementIndex =  updatedProducts.indexOf(product)
-    let {quantity} = product;
+    const updatedProducts = products
+    .map(p =>
+      p.id === id ? { ...p, quantity: p.quantity - 1 } : p,
+    )
+    .filter(item => item.quantity>0);
 
-    if(quantity>0){
-      quantity -= 1;
-      updatedProducts[elementIndex] = {...updatedProducts[elementIndex], quantity}
-      setProducts(updatedProducts);
+    setProducts(updatedProducts);
 
-
-      try {
-        await AsyncStorage.setItem(
-        '@GoMarketplace:products',
-        JSON.stringify(products)
-      );
-
-    } catch (error) {
-      // Error saving data
-      console.log(error);
-    }
-
-    } else {
-      return;
-    }
+    await AsyncStorage.setItem(
+      '@GoMarketplace:products',
+      JSON.stringify(products)
+    );
 
 
-  }, [products, setProducts]);
+  }, [products]);
 
   const value = React.useMemo(
     () => ({ addToCart, increment, decrement, products }),
