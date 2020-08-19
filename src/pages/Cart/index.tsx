@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 
-import { View } from 'react-native';
+import { View, AccessibilityInfo } from 'react-native';
 
 import {
   Container,
@@ -38,24 +38,27 @@ interface Product {
 const Cart: React.FC = () => {
   const { increment, decrement, products } = useCart();
 
+
   function handleIncrement(id: string): void {
     // TODO
+    increment(id);
   }
 
   function handleDecrement(id: string): void {
     // TODO
+    decrement(id);
   }
 
   const cartTotal = useMemo(() => {
     // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
 
-    return formatValue(0);
+    return formatValue(products.reduce((sum: number, b: Product) => sum + b.quantity * b.price, 0));
   }, [products]);
 
   const totalItensInCart = useMemo(() => {
     // TODO RETURN THE SUM OF THE QUANTITY OF THE PRODUCTS IN THE CART
 
-    return products;
+    return products.reduce((sum: number, b: Product) => sum + b.quantity, 0);
   }, [products]);
 
   return (

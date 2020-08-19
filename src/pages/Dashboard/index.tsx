@@ -36,21 +36,10 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     async function loadProducts(): Promise<void> {
       // TODO
-      const response = await api.get('products');
-      let formattedProducts: Product[] = response.data;
-        formattedProducts = formattedProducts.map(product => {
-          const { id, title, image_url, price } = product;
+      const { data } = await api.get('products') ;
 
-          const formattedValue = formatValue(Number(price));
 
-          return {
-            id,
-            title,
-           image_url,
-           price,
-          };
-        });
-        setProducts(formattedProducts);
+        setProducts(data);
 
     }
 
